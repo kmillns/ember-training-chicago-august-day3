@@ -15,32 +15,37 @@
     <script src="tests/load-tests.js"></script>
   </head>
   <body>
-    <script type="text/x-handlebars">
-      <header><h1>BümBöx</h1></header>
+    <script type="text/x-handlebars" data-template-name="application">
+      <header>
+        <h1>BümBöx</h1>
+      </header>
+
       {{outlet}}
 
-      {{render 'nowPlaying'}}
+      {{render "nowPlaying"}}
     </script>
 
-    <script type="text/x-handlebars" id="index">
+    <script type="text/x-handlebars" data-template-name="index">
       <div class="album-list">
         {{#each}}
-          <div class="album">
-            {{#linkTo 'album' this}}
-              <img {{bindAttr src=artwork}}>
-            {{/linkTo}}
-            <p class="album-name">{{name}}</p>
-            <p class="album-artist">{{artist}}</p>
-            <p class="song-count">
-              8 songs
-              {{#if isExplicit}}<span class="explicit">EXPLICIT</span>{{/if}}
-            </p>
-          </div>
+        <div class="album">
+          {{#linkTo 'album' this}}
+            <img {{bindAttr src=artwork}}>
+          {{/linkTo}}
+          <p class="album-name">{{name}}</p>
+          <p class="album-artist">{{artist}}</p>
+          <p class="song-count">
+            8 songs
+            {{#if isExplicit}}
+              <span class="explicit">EXPLICIT</span>
+            {{/if}}
+          </p>
+        </div>
         {{/each}}
       </div>
     </script>
 
-    <script type="text/x-handlebars" id="album">
+    <script type="text/x-handlebars" data-template-name="album">
       <div class="album-info">
         <img {{bindAttr src=artwork}}>
         <h1>{{name}}</h1>
@@ -52,7 +57,7 @@
           <tr>
             <td class="song-track">
               <span class="track-number">{{track}}</span>
-              <span class="play" {{action 'play' this}}>▶</span>
+              <span class="play" {{action "play" this}}>▶</span>
             </td>
             <td class="song-name">{{name}}</td>
             <td class="song-duration">{{format-duration duration}}</td>
@@ -64,7 +69,7 @@
       </table>
     </script>
 
-    <script type="text/x-handlebars" id="nowPlaying">
+    <script type="text/x-handlebars" data-template-name="nowPlaying">
       <footer class="now-playing">
         {{#if model}}
           <img class="now-playing-artwork" {{bindAttr src=album.artwork}}>
@@ -74,7 +79,7 @@
               <span class="now-playing-artist">{{album.artist}}</span>
             </p>
             <div class="now-playing-player">
-              {{audio-player src=url}}
+              {{audio-player src=url duration=duration}}
             </div>
           </div>
         {{else}}
@@ -83,8 +88,23 @@
       </footer>
     </script>
 
-    <script type="text/x-handlebars" id="components/audio-player">
-      <audio autoplay {{bindAttr src=src}}></audio>
+    <script type="text/x-handlebars" data-template-name="components/audio-player">
+      <audio {{bindAttr src=src}} autoplay></audio>
+      {{#if isPlaying}}
+        <button {{action pause}} class="pause">❙❙</button>
+        {{toggle-time currentTime=currentTime duration=duration}}
+      {{else}}
+        <button {{action play}} class="play">▶</button>
+      {{/if}}
+    </script>
+
+    <script type="text/x-handlebars" data-template-name="components/toggle-time">
+      {{#if showingCurrent}}
+        <span {{action toggleTime}} class="currentTime">{{format-duration currentTime}}</span>
+      {{else}}
+        <span {{action toggleTime}} class="remainingTime">{{format-duration remainingTime}}</span>
+      {{/if}}
+      <span class="duration">{{format-duration duration}}</span>
     </script>
 
     <div id="qunit" style="display: none"></div>
